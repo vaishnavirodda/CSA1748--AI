@@ -1,0 +1,57 @@
+# Function to check if the current color assignment is valid
+def is_safe(node, color, graph, color_assignment):
+    # Check all adjacent nodes (neighbors)
+    for neighbor in graph[node]:
+        if color_assignment[neighbor] == color:
+            return False
+    return True
+
+# Backtracking function to solve the map coloring problem
+def map_coloring(graph, num_colors, color_assignment, node):
+    # If all nodes are assigned a color, return True
+    if node == len(graph):
+        return True
+
+    # Try different colors for the current node
+    for color in range(1, num_colors + 1):
+        if is_safe(node, color, graph, color_assignment):
+            # Assign color to the node
+            color_assignment[node] = color
+
+            # Recursively assign colors to the rest of the nodes
+            if map_coloring(graph, num_colors, color_assignment, node + 1):
+                return True
+
+            # If assigning the current color doesn't lead to a solution, backtrack
+            color_assignment[node] = 0
+
+    return False
+
+# Function to start the map coloring process
+def solve_map_coloring(graph, num_colors):
+    color_assignment = [0] * len(graph)  # Array to store color assignment for each node
+
+    if not map_coloring(graph, num_colors, color_assignment, 0):
+        return "No solution found"
+    
+    # Return the color assignment for each node
+    return color_assignment
+
+# Example usage
+if __name__ == "__main__":
+    # Graph representation (adjacency list)
+    # Each index represents a region, and each list contains the neighboring regions
+    graph = [
+        [1, 2, 3],    # Neighbors of region 0
+        [0, 2],       # Neighbors of region 1
+        [0, 1, 3],    # Neighbors of region 2
+        [0, 2],       # Neighbors of region 3
+    ]
+
+    num_colors = 3  # Number of colors (e.g., 3-color problem)
+    solution = solve_map_coloring(graph, num_colors)
+
+    if isinstance(solution, str):
+        print(solution)
+    else:
+        print("Solution found! Color assignments:", solution)
