@@ -1,0 +1,46 @@
+import itertools
+
+# Function to calculate the total distance of a given tour
+def calculate_total_distance(tour, distance_matrix):
+    total_distance = 0
+    num_cities = len(tour)
+    
+    for i in range(num_cities):
+        # Add the distance between consecutive cities
+        total_distance += distance_matrix[tour[i]][tour[(i + 1) % num_cities]]
+    
+    return total_distance
+
+# Function to solve TSP using brute force
+def tsp_brute_force(distance_matrix):
+    # Number of cities
+    num_cities = len(distance_matrix)
+    
+    # Generate all possible tours (permutations of cities)
+    cities = list(range(num_cities))
+    min_tour = None
+    min_distance = float('inf')
+    
+    for tour in itertools.permutations(cities):
+        current_distance = calculate_total_distance(tour, distance_matrix)
+        
+        # Check if current tour is shorter than the current minimum
+        if current_distance < min_distance:
+            min_distance = current_distance
+            min_tour = tour
+    
+    return min_tour, min_distance
+
+# Main function
+if __name__ == "__main__":
+    # Example distance matrix (4 cities)
+    distance_matrix = [
+        [0, 10, 15, 20],
+        [10, 0, 35, 25],
+        [15, 35, 0, 30],
+        [20, 25, 30, 0]
+    ]
+    
+    tour, distance = tsp_brute_force(distance_matrix)
+    print("Optimal tour:", tour)
+    print("Minimum distance:", distance)
