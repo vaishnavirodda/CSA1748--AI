@@ -1,0 +1,46 @@
+# Import necessary libraries
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Flatten
+from tensorflow.keras.datasets import mnist
+from tensorflow.keras.utils import to_categorical
+
+# Load the MNIST dataset (Handwritten digits)
+(X_train, y_train), (X_test, y_test) = mnist.load_data()
+
+# Normalize the input data (pixel values from 0 to 255 -> 0 to 1)
+X_train = X_train / 255.0
+X_test = X_test / 255.0
+
+# One-hot encode the labels (for multiclass classification)
+y_train = to_categorical(y_train, 10)  # 10 output classes (digits 0-9)
+y_test = to_categorical(y_test, 10)
+
+# Build a feedforward neural network model
+model = Sequential()
+
+# Flatten the input (28x28 pixels to a 784-dimensional vector)
+model.add(Flatten(input_shape=(28, 28)))
+
+# First hidden layer with 128 neurons and ReLU activation
+model.add(Dense(128, activation='relu'))
+
+# Second hidden layer with 64 neurons and ReLU activation
+model.add(Dense(64, activation='relu'))
+
+# Output layer with 10 neurons (one for each class) and softmax activation
+model.add(Dense(10, activation='softmax'))
+
+# Compile the model
+model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+
+# Train the model
+model.fit(X_train, y_train, epochs=10, batch_size=32, validation_data=(X_test, y_test))
+
+# Evaluate the model on the test set
+test_loss, test_acc = model.evaluate(X_test, y_test)
+print(f'Test accuracy: {test_acc * 100:.2f}%')
+
+# Optional: Make predictions on new data
+predictions = model.predict(X_test)
+print("Predicted class for the first test sample:", predictions[0].argmax())
