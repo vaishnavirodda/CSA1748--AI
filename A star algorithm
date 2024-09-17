@@ -1,0 +1,73 @@
+from queue import PriorityQueue
+
+# A* Algorithm
+def a_star_algorithm(start_node, goal_node, graph, h):
+    open_list = PriorityQueue()  # Priority queue for nodes to explore
+    open_list.put((0, start_node))  # Start with the start_node, g(n) = 0
+    came_from = {}  # Tracks the best path to each node
+    g_score = {node: float('inf') for node in graph}  # Tracks the cost to reach each node
+    g_score[start_node] = 0
+    f_score = {node: float('inf') for node in graph}  # f(n) = g(n) + h(n)
+    f_score[start_node] = h[start_node]
+
+    while not open_list.empty():
+        # Get the node with the lowest f(n) value
+        current_f, current_node = open_list.get()
+
+        # If we reached the goal node, reconstruct and return the path
+        if current_node == goal_node:
+            return reconstruct_path(came_from, current_node)
+
+        # Explore neighbors of the current node
+        for neighbor, weight in graph[current_node]:
+            tentative_g_score = g_score[current_node] + weight
+
+            if tentative_g_score < g_score[neighbor]:
+                came_from[neighbor] = current_node
+                g_score[neighbor] = tentative_g_score
+                f_score[neighbor] = g_score[neighbor] + h[neighbor]
+                open_list.put((f_score[neighbor], neighbor))
+
+    return None  # No path found
+
+# Helper function to reconstruct the path from start to goal
+def reconstruct_path(came_from, current_node):
+    path = [current_node]
+    while current_node in came_from:
+        current_node = came_from[current_node]
+        path.append(current_node)
+    path.reverse()
+    return path
+
+# Example usage
+if __name__ == "__main__":
+    # Example graph (Adjacency list representation)
+    graph = {
+        'A': [('B', 1), ('C', 4)],
+        'B': [('A', 1), ('D', 2), ('E', 5)],
+        'C': [('A', 4), ('F', 3)],
+        'D': [('B', 2)],
+        'E': [('B', 5), ('F', 1)],
+        'F': [('C', 3), ('E', 1)]
+    }
+
+    # Example heuristic function (estimated cost to reach goal)
+    h = {
+        'A': 7,
+        'B': 6,
+        'C': 2,
+        'D': 4,
+        'E': 3,
+        'F': 0  # Assuming F is the goal node
+    }
+
+    start_node = 'A'
+    goal_node = 'F'
+
+    # Perform A* search
+    path = a_star_algorithm(start_node, goal_node, graph, h)
+
+    if path:
+        print("Path found:", path)
+    else:
+        print("No path found.")
